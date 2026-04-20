@@ -1,74 +1,165 @@
 ﻿using System;
 
-public class Employee {
-    protected double Salary { get; }   
-    
-    public Employee(double salary){
-        if (salary <= 0){
-            Console.WriteLine("Invalid salary: Default salary = $500");
-            Salary = 500;
-        }
-        else{
-            Salary = salary; 
-        }
+public class Animal
+{
+    public string Name { get; }
+    public int Lifespan { get; }
+    public int SleepTime { get; }
+
+    public Animal(string name, int lifespan, int sleepTime)
+    {
+        Name = name;
+        Lifespan = lifespan;
+        SleepTime = sleepTime;
     }
 
-    public double GetSalary() {
-        return Salary;
-    }
-    
-    public double getBonus(){
-        Console.Write("Enter bonus percent: ");
-        return Convert.ToDouble(Console.ReadLine());
-    }
-}
-
-public class Developer : Employee {
-    private string Language { get; } 
-
-    public Developer(double salary, string language) : base(salary){
-        Language = language;  
+    public virtual void Eat()
+    {
+        Console.WriteLine($"{Name} eats.");
     }
 
-    public string GetLanguage(){
-        return Language;
+    public void Sleep()
+    {
+        Console.WriteLine($"{Name} sleeps {SleepTime} hours");
     }
 
-    public double BonusSalary(){
-        double bonus = base.getBonus();
-        return Salary + Salary * bonus / 100;
+    public virtual void Voice()
+    {
+        Console.WriteLine($"{Name} voices");
     }
 }
 
-public class Manager : Employee {
-    private int TeamSize { get; set; }
+public class Aquatic : Animal
+{
+    private int swimming_speed;
 
-    public Manager(double salary, int teamSize) : base(salary){
-        TeamSize = teamSize;
+    public Aquatic(string name, int lifespan, int sleepTime, int swimming_speed)
+        : base(name, lifespan, sleepTime)
+    {
+        this.swimming_speed = swimming_speed;
     }
 
-    public double BonusSalary(){
-        double bonus = base.getBonus();
-        if (TeamSize > 5){
-            return Salary + Salary * (bonus + 10) / 100;
-        }
-        return Salary + Salary * bonus / 100;
+    public void Swim()
+    {
+        Console.WriteLine($"{Name} swimming speed is {swimming_speed}.");
     }
 }
 
-class Program {
-    static void Main() {
+public class Terrestrial : Animal
+{
+    private bool has_fur;
 
-        Console.WriteLine("=== Developers ===");
+    public Terrestrial(string name, int lifespan, int sleepTime, bool has_fur)
+        : base(name, lifespan, sleepTime)
+    {
+        this.has_fur = has_fur;
+    }
 
-        Developer d1 = new Developer(1000.0, "C#");
-        Console.WriteLine($"Language: {d1.GetLanguage()}, Salary: {d1.GetSalary()}");
-        Console.WriteLine($"Final Salary: {d1.BonusSalary()}\n");
+    public void Fur()
+    {
+        Console.WriteLine($"{Name} Furs : {has_fur}");
+    }
+}
 
-        Console.WriteLine("=== Managers ===");
+public class Bird : Animal
+{
+    private int flying_height;
 
-        Manager m1 = new Manager(2000.0, 6);
-        Console.WriteLine($"Salary: {m1.GetSalary()}");
-        Console.WriteLine($"Final Salary: {m1.BonusSalary()}");
+    public Bird(string name, int lifespan, int sleepTime, int flying_height)
+        : base(name, lifespan, sleepTime)
+    {
+        this.flying_height = flying_height;
+    }
+
+    public void Fly()
+    {
+        Console.WriteLine($"{Name} flying_height is {flying_height}.");
+    }
+
+    public override void Eat()
+    {
+        Console.WriteLine($"{Name} eats worm.");
+    }
+}
+
+public class Amphibian : Animal
+{
+    private bool has_gills;
+
+    public Amphibian(string name, int lifespan, int sleepTime, bool has_gills)
+        : base(name, lifespan, sleepTime)
+    {
+        this.has_gills = has_gills;
+    }
+
+    public void Gill()
+    {
+        Console.WriteLine($"{Name} gills : {has_gills}");
+    }
+}
+
+public class Dog : Terrestrial
+{
+    public Dog(string name, int lifespan, int sleepTime, bool has_fur)
+        : base(name, lifespan, sleepTime, has_fur) { }
+
+    public override void Voice()
+    {
+        Console.WriteLine("Dog barks.");
+    }
+
+    public override void Eat()
+    {
+        Console.WriteLine($"{Name} eats bones.");
+    }
+}
+
+public class Eagle : Bird
+{
+    public Eagle(string name, int lifespan, int sleepTime, int flying_height)
+        : base(name, lifespan, sleepTime, flying_height) { }
+
+    public override void Eat()
+    {
+        Console.WriteLine($"{Name} eats sheeps.");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Aquatic aquatic = new Aquatic("Sig", 5, 8, 10);
+        Bird bird = new Bird("Parrot", 4, 5, 50);
+        Amphibian amphibian = new Amphibian("Frog", 4, 6, true);
+        Dog dog = new Dog("Dog", 15, 8, true);
+        Eagle eagle = new Eagle("Eagle", 40, 5, 4000);
+
+        Console.WriteLine();
+        aquatic.Eat();
+        aquatic.Sleep();
+        aquatic.Swim();
+
+        Console.WriteLine();
+
+        dog.Eat();
+        dog.Sleep();
+        dog.Voice();
+
+        Console.WriteLine();
+
+        bird.Eat();
+        bird.Voice();
+
+        Console.WriteLine();
+
+        eagle.Eat();
+        eagle.Voice();
+        eagle.Sleep();
+
+        Console.WriteLine();
+
+        amphibian.Eat();
+        amphibian.Voice();
     }
 }
