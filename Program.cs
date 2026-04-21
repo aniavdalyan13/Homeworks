@@ -1,127 +1,95 @@
 ﻿using System;
+using System.Collections.Generic;
 
-public class Animal
+public class Bank_Account
 {
-    public string Name { get; }
-    public int Lifespan { get; }
-    public int SleepTime { get; }
-
-    public Animal(string name, int lifespan, int sleepTime)
+    public int Id { get; }
+    public string OwnerName { get; }
+    private decimal Balance;
+    private int transactionCount = 0;
+    
+    protected List<Transaction> transactions = new List<Transaction>();
+    
+    
+    public Bank_Account(int id, string ownerName, decimal balance)
     {
-        Name = name;
-        Lifespan = lifespan;
-        SleepTime = sleepTime;
+        Id = id;
+        OwnerName = ownerName;
+        Balance = balance;
+         
+    }
+    
+    public void Deposit(decimal amount){
+        transactions.Add(new Transaction(amount, DateTime.Now, "Deposit"));
+        transactionCount++;
+        Balance += amount;
+        Console.WriteLine($"Deposit {amount}$");
+        
+    }
+    
+    public void Withdraw(decimal amount){
+        transactions.Add(new Transaction(amount, DateTime.Now, "Deposit"));
+        transactionCount++;
+
+        if (amount > Balance)
+        {
+            Console.WriteLine("Insufficient funds");
+        }
+        else
+        {
+            Balance -= amount;
+            Console.WriteLine($"Withdraw {amount}$");
+        }
     }
 
-    public virtual void Eat()
+    public void GetTransactionCount()
     {
-        Console.WriteLine($"{Name} eats.");
+        Console.WriteLine($"Transactions: {transactionCount}");
     }
 
-    public void Sleep()
+    public void ShowBalance()
     {
-        Console.WriteLine($"{Name} sleeps {SleepTime} hours");
+        Console.WriteLine($"Balance: {Balance}$");
+    }
+    
+    public override string ToString() => $"Bank_Account {Id} | Transactions: {transactionCount}";
+    
+    public class Transaction
+    {
+        public decimal Amount { get; }
+        public DateTime Date { get; }
+        public string Type { get; }
+
+        public Transaction(decimal amount, DateTime date, string type)
+        {
+            Amount = amount;
+            Date = date;
+            Type = type;
+        }
     }
 
-    public virtual void Voice()
+    public override bool Equals(object obj)
     {
-        Console.WriteLine($"{Name} voices");
+        return Id == ((Bank_Account)obj).Id;
+    }   
+    
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }
 
-public class Aquatic : Animal
+public sealed class AccountStatement : Bank_Account
 {
-    private int swimming_speed;
+    public AccountStatement(int id, string ownerName, decimal balance)
+        : base(id, ownerName, balance) {}
 
-    public Aquatic(string name, int lifespan, int sleepTime, int swimming_speed)
-        : base(name, lifespan, sleepTime)
+    public void Print()
     {
-        this.swimming_speed = swimming_speed;
-    }
-
-    public void Swim()
-    {
-        Console.WriteLine($"{Name} swimming speed is {swimming_speed}.");
-    }
-}
-
-public class Terrestrial : Animal
-{
-    private bool has_fur;
-
-    public Terrestrial(string name, int lifespan, int sleepTime, bool has_fur)
-        : base(name, lifespan, sleepTime)
-    {
-        this.has_fur = has_fur;
-    }
-
-    public void Fur()
-    {
-        Console.WriteLine($"{Name} Furs : {has_fur}");
-    }
-}
-
-public class Bird : Animal
-{
-    private int flying_height;
-
-    public Bird(string name, int lifespan, int sleepTime, int flying_height)
-        : base(name, lifespan, sleepTime)
-    {
-        this.flying_height = flying_height;
-    }
-
-    public void Fly()
-    {
-        Console.WriteLine($"{Name} flying_height is {flying_height}.");
-    }
-
-    public override void Eat()
-    {
-        Console.WriteLine($"{Name} eats worm.");
-    }
-}
-
-public class Amphibian : Animal
-{
-    private bool has_gills;
-
-    public Amphibian(string name, int lifespan, int sleepTime, bool has_gills)
-        : base(name, lifespan, sleepTime)
-    {
-        this.has_gills = has_gills;
-    }
-
-    public void Gill()
-    {
-        Console.WriteLine($"{Name} gills : {has_gills}");
-    }
-}
-
-public class Dog : Terrestrial
-{
-    public Dog(string name, int lifespan, int sleepTime, bool has_fur)
-        : base(name, lifespan, sleepTime, has_fur) { }
-
-    public override void Voice()
-    {
-        Console.WriteLine("Dog barks.");
-    }
-
-    public override void Eat()
-    {
-        Console.WriteLine($"{Name} eats bones.");
-    }
-}
-
-public class Eagle : Bird
-{
-    public Eagle(string name, int lifespan, int sleepTime, int flying_height)
-        : base(name, lifespan, sleepTime, flying_height) { }
-
-    public override void Eat()
-    {
-        Console.WriteLine($"{Name} eats sheeps.");
+        foreach (var t in transactions)
+        {
+            Console.WriteLine($"{t.Type}: {t.Amount}$ on {t.Date}");
+        }
     }
 }
 
@@ -129,37 +97,17 @@ class Program
 {
     static void Main()
     {
-        Aquatic aquatic = new Aquatic("Sig", 5, 8, 10);
-        Bird bird = new Bird("Parrot", 4, 5, 50);
-        Amphibian amphibian = new Amphibian("Frog", 4, 6, true);
-        Dog dog = new Dog("Dog", 15, 8, true);
-        Eagle eagle = new Eagle("Eagle", 40, 5, 4000);
-
-        Console.WriteLine();
-        aquatic.Eat();
-        aquatic.Sleep();
-        aquatic.Swim();
-
-        Console.WriteLine();
-
-        dog.Eat();
-        dog.Sleep();
-        dog.Voice();
-
-        Console.WriteLine();
-
-        bird.Eat();
-        bird.Voice();
-
-        Console.WriteLine();
-
-        eagle.Eat();
-        eagle.Voice();
-        eagle.Sleep();
-
-        Console.WriteLine();
-
-        amphibian.Eat();
-        amphibian.Voice();
+        Bank_Account account = new Bank_Account(10, "Ani", 100);
+        account.Deposit(100);
+        account.Withdraw(100);
+        account.GetTransactionCount();
+        
+        Bank_Account account2 = new Bank_Account(10, "Ani", 100);
+        
+        Console.WriteLine(Bank_Account.Equals (account, account2));
+        
+        AccountStatement accountStatement = new AccountStatement(10, "Mari", 100);
+        accountStatement.Print();
+        
     }
 }
